@@ -1,0 +1,31 @@
+server:
+  port: 8080 
+tomcat:
+  threads:
+    max: 2
+spring:
+  application:
+    name: GATEWAY-SERVICE
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 862439648730-vsjiquo5dnr27auh06egk5s72432be79.apps.googleusercontent.com
+            client-secret: o1aRGwy77jRR_0udBSxy9yUG
+            scope: email,profile
+  cloud:
+    gateway:
+      gateway:
+        discovery:
+          locator:
+            enabled: true
+jwt:
+  secret: BvPHGM8C0ia4uOuxxqPD5DTbWC9F9TWvPStp3pb7ARo0oK2mJ3pd3YG4lxA9i8bj6OTbadwezxgeEByY
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8079/eureka}
+  instance:
+    preferIpAddress: true

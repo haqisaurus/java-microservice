@@ -1,0 +1,59 @@
+
+
+spring:
+  # kafka:
+  #   bootstrap-servers: glider.srvs.cloudkafka.com:9094
+  #   properties:
+  #     security.protocol: SASL_SSL
+  #     sasl.mechanism: SCRAM-SHA-256
+  #     sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="eybaugdf" password="hb2umr-KlHM0JSQG68vvhubTJtxFA6Gc";
+  #   consumer:
+  #     group-id: eybaugdf-ProductService
+  tomcat:
+    threads:
+      max: 2
+  application:
+    name: PRODUCT-SERVICE
+  # DB CONFIG
+  data:
+    jpa:
+      repositories:
+        enabled: true
+  datasource:
+        platform: mariadb
+        # driverClassName: org.mariadb.jdbc.Driver
+        driver-class-name: org.mariadb.jdbc.Driver
+        # Fixed in v1.3.3. Doesn't work with mariadb-connector-j v1.3.2 (CONJ-227)
+        url: jdbc:mariadb:failover://localhost:3306/ms_product?autoReconnect=true
+        # If some of the hosts is down, app won't launch. v1.3.3
+        #url: jdbc:mariadb:failover://192.168.33.11:3306,192.168.33.12:3306,192.168.33.13:3306/test?autoReconnect=true
+        # Works with mariadb-connector-j v1.3.2
+        #url: jdbc:mysql:failover://192.168.33.11:3306/test
+        username: root
+        password: tekanenter
+
+        timeBetweenEvictionRunsMillis: 1000
+        testWhileIdle: true
+        validationQuery: SELECT 1
+ 
+  jpa:
+    database: MYSQL
+  # Hibernate ddl auto (create, create-drop, validate, update) 
+    hibernate:
+      ddlAuto: update
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8079/eureka}
+  instance:
+    preferIpAddress: true
+server:
+  servlet:
+    context-path: /product
+  port: 8082
+  error:
+    include-message: always
+    include-binding-errors: always
+jwt:
+  secret: BvPHGM8C0ia4uOuxxqPD5DTbWC9F9TWvPStp3pb7ARo0oK2mJ3pd3YG4lxA9i8bj6OTbadwezxgeEByY
+  expiredInDays: 1
