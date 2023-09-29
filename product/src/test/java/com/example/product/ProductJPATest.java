@@ -26,7 +26,7 @@ public class ProductJPATest {
     private ProductRepo productRepo;
 
     @BeforeAll
-    public void setup() {
+    public void setupDB() {
         productRepo.deleteAll();
     }
 
