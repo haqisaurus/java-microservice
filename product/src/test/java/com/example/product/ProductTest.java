@@ -2,14 +2,18 @@ package com.example.product;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
 
+import org.assertj.core.util.DateUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +23,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -34,6 +40,7 @@ import com.example.product.config.jwt.JwtTokenUtil;
 import com.example.product.config.jwt.JwtUserDetail;
 import com.example.product.controller.ProductController;
 import com.example.product.dto.request.ReqProduct;
+import com.example.product.dto.response.ResProduct;
 import com.example.product.entity.Product;
 import com.example.product.repository.ProductRepo;
 import com.example.product.service.ProductService;
@@ -47,27 +54,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.hamcrest.Matchers.hasSize;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @SpringBootTest
+@ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class ProductTest {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(ProductTest.class);
     @Autowired
     private MockMvc mockMvc;
-    @InjectMocks
+    @Autowired
     KafkaOrderService kafkaOrderService;
-    
+
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     JwtTokenUtil tokenUtil;
+    // bagian ini untuk test dari db langusng
+    @Mock
+    private ProductRepo productRepo;
+    @InjectMocks
+    private ProductService productServiceDb;
+    // e: bagian ini untuk test dari db langusng
     @MockBean
     private ProductService productService;
+
     private Product product;
     private String token;
 
@@ -79,6 +97,67 @@ public class ProductTest {
         Map<String, Object> claims = tokenUtil.generateUserToken(userDetail);
         log.info(claims.get("token").toString());
         token = "Bearer " + claims.get("token").toString();
+    }
+
+    @Test
+    public void testProductPage() throws Exception {
+        ResProduct r1 = new ResProduct();
+        r1.setId(3L);
+        r1.setName("gelas");
+        r1.setQty(3);
+        r1.setPrice(1000);
+        r1.setProductId(3L);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.ssXXX");
+        Date parsedDate = dateFormat.parse("2023-09-26T08:43:00.178+00:00");
+        Timestamp update = new java.sql.Timestamp(parsedDate.getTime());
+        r1.setUpdatedAt(update);
+        parsedDate = dateFormat.parse("2023-09-26T08:43:00.177+00:00");
+        Timestamp create = new java.sql.Timestamp(parsedDate.getTime());
+        r1.setCreatedAt(create);
+
+        PageRequest pagination = PageRequest.of(0, 1, Direction.DESC, "id");
+        List<ResProduct> productList = Arrays.asList(r1);
+        Page<ResProduct> productPage = new PageImpl<>(productList, pagination, productList.size());
+        // when(productService.getProductList(pagination)).thenReturn(productPage);
+
+        // test langsung dari database
+        Product rdb1 = new Product();
+        rdb1.setId(3L);
+        rdb1.setName("gelasd");
+        rdb1.setQty(3);
+        rdb1.setPrice(1000);
+        rdb1.setUpdatedAt(update);
+        rdb1.setCreatedAt(create);
+        List<Product> productListDb = Arrays.asList(rdb1);
+        Page<Product> productPageDb = new PageImpl<>(productListDb, pagination,
+        productList.size());
+
+        Page<Product> whencall = productRepo.findAll(pagination);
+        when(productRepo.findAll(pagination)).thenReturn(productPageDb);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/list")
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .param("page", "0")
+                .param("size", "1")
+                .param("sort", "id,desc");
+
+        MvcResult mvcResult = mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                // .andExpect(MockMvcResultMatchers.jsonPath("$.number").value(0))
+                .andExpect(jsonPath("$.content[*].id").value(3))
+                .andExpect(jsonPath("$.content[*].name").value("gelas"))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+        String actualResponseBody = mvcResult.getResponse().getContentAsString();
+        log.info(actualResponseBody);
+
+        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(productService).getProductList("",pageableCaptor.capture());
+        PageRequest pageable = (PageRequest) pageableCaptor.getValue();
+        log.info(pageable.toString());
+
     }
 
     @Test
@@ -97,11 +176,13 @@ public class ProductTest {
 
     @Test
     public void testConsumer() {
-        assertDoesNotThrow(() -> kafkaOrderService.handleOrderListener(
-                "{\"id\":1,\"updatedAt\":1695351885119,\"createdAt\":1695279058383,\"userId\":1,\"carts\":[{\"id\":4,\"updatedAt\":1695346571015,\"createdAt\":1695346326507,\"name\":null,\"qty\":9,\"price\":1000},{\"id\":5,\"updatedAt\":1695346671479,\"createdAt\":1695346658448,\"name\":null,\"qty\":2,\"price\":1000}],\"status\":\"DRAFT\"}"));
+        assertDoesNotThrow(() -> {
+            String message = "{\"id\":2,\"updatedAt\":1695720243935,\"createdAt\":1695720243934,\"userId\":1,\"carts\":[{\"id\":2,\"updatedAt\":1695720293122,\"createdAt\":1695720293122,\"productId\":1,\"name\":null,\"qty\":1000,\"price\":1000}],\"status\":\"DRAFT\"}";
+
+            kafkaOrderService.handleOrderListener(message);
+        });
     }
 
-   
     @Test
     public void addProductReturnTrue() throws JsonProcessingException, Exception {
         // given

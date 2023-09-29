@@ -1,6 +1,7 @@
 package com.example.order.entity;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,7 +32,7 @@ public class Order {
     Long userId;
     @OneToMany(targetEntity = Cart.class, mappedBy = "order", orphanRemoval = false, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<Cart> carts;
+    private List<Cart> carts = new ArrayList<Cart>();;
     String status;
     int total;
 }

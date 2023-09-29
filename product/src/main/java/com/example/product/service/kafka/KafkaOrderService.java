@@ -33,7 +33,7 @@ public class KafkaOrderService {
 
         order = objectMapper.readValue(message, ResOrder.class);
 
-        log.info(order.toString());
+        log.info(order.getCarts().toString());
         // check quantity
         List<ReqCanceledProduct> errorProducts = new ArrayList<ReqCanceledProduct>();
         order.getCarts().stream().forEach(v -> {

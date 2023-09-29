@@ -4,6 +4,7 @@ package com.example.product.dto.response;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -17,6 +18,6 @@ public class ResOrder {
     Timestamp updatedAt;
     Timestamp createdAt;
     Long userId; 
-    private List<ResProduct> carts = new ArrayList<ResProduct>();
+    private List<ResProduct> carts;
     String status;
 }

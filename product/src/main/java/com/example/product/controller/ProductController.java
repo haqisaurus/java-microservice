@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.product.dto.request.ReqProduct;
 import com.example.product.dto.response.ResCommon;
 import com.example.product.dto.response.ResOrder;
+import com.example.product.dto.response.ResProduct;
 import com.example.product.entity.Product;
 import com.example.product.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -67,11 +68,9 @@ public class ProductController {
         // Authentication authentication =
         // SecurityContextHolder.getContext().getAuthentication();
         // JwtUserDetail userDetails = (JwtUserDetail) authentication.getPrincipal();
-        Page<Product> list = productService.getProductList(pageable);
-        if (request.getParameter("search") != null && !request.getParameter("search").isEmpty()) {
-            String search = request.getParameter("search");
-            list = productService.searchQuery(search, pageable);
-        }
+        String search = request.getParameter("search");
+        Page<ResProduct> list = productService.getProductList(search, pageable);
+        
         return ResponseEntity.ok(list);
     }
 
