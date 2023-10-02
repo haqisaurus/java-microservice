@@ -16,9 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,7 +54,7 @@ public class ProductController {
                 String message = error.getDefaultMessage();
                 errors.put(fieldName, message);
             });
-            return new ResponseEntity(errors, null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errors, null, HttpStatus.BAD_REQUEST);
 
         }
         log.info(req.toString());
@@ -70,16 +72,16 @@ public class ProductController {
         // JwtUserDetail userDetails = (JwtUserDetail) authentication.getPrincipal();
         String search = request.getParameter("search");
         Page<ResProduct> list = productService.getProductList(search, pageable);
-        
+
         return ResponseEntity.ok(list);
     }
 
     @GetMapping(value = "/product-list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getProductLists( ) {
+    public ResponseEntity<?> getProductLists() {
         // Authentication authentication =
         // SecurityContextHolder.getContext().getAuthentication();
         // JwtUserDetail userDetails = (JwtUserDetail) authentication.getPrincipal();
-        
+
         return ResponseEntity.ok(productService.getList());
     }
 
@@ -101,4 +103,20 @@ public class ProductController {
         }
         return ResponseEntity.ok(order);
     }
+
+    @PutMapping(value = "/update-product/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateProduct(@Valid @RequestBody ReqProduct req, BindingResult result,
+            @PathVariable("id") long id) {
+        ResProduct response = productService.updateProduct(id, req);
+        return ResponseEntity.ok(response);
+
+    }
+
+    @DeleteMapping(value = "/delete-product/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") long id) {
+        productService.deleteProduct(id);
+        return new ResponseEntity<>(null, null, HttpStatus.NO_CONTENT);
+
+    }
+
 }

@@ -31,6 +31,25 @@ public class ProductService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Transactional
+    public void deleteProduct(Long id) {
+        productRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("product Id not found"));
+        productRepo.deleteById(id);
+    }
+
+    @Transactional
+    public ResProduct updateProduct(Long id, ReqProduct req) {
+        ResProduct res = null;
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("product Id not found"));
+        product.setName(req.getName());
+        product.setQty(req.getQty());
+        product.setPrice(req.getPrice());
+        productRepo.save(product);
+        res = modelMapper.map(product, ResProduct.class);
+        return res;
+    }
+
     public Page<ResProduct> getProductList(String search, Pageable pageable) {
         log.info("saya terpanggil");
         Page<Product> paged = new PageImpl<>(new ArrayList<>(), pageable, 0);
@@ -48,7 +67,7 @@ public class ProductService {
             }
         });
         return newPaged;
-    } 
+    }
 
     public Product getDetail(long id) {
         Product product = productRepo.findById(id)

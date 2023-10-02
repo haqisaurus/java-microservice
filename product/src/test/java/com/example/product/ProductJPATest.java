@@ -36,6 +36,13 @@ public class ProductJPATest {
     // }
 
     @Test
+    void updateProduct() {
+        Product prod = Product.builder().name("nama").qty(12).price(1000).build();
+        productRepo.save(prod);
+        Assertions.assertThat(prod.getId()).isNotNull();
+    }
+
+    @Test
     @Sql(scripts = { "classpath:insert-product.sql" })
     void whenInsertProduct() {
         Optional<Product> user = productRepo.findById(3L);
@@ -46,7 +53,7 @@ public class ProductJPATest {
     @Test 
     void countTest() {
         List<Product> list = productRepo.findAll();
-        Assertions.assertThat(list.size()).isEqualTo(3);
+        Assertions.assertThat(list.size()).isEqualTo(4);
 
     }
 }
