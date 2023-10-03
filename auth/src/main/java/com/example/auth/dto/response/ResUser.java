@@ -7,9 +7,11 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data 
+@Builder
 public class ResUser {
     Long id; 
     String firstName;
