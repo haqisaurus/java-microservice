@@ -125,12 +125,12 @@ public class ProductTest {
                                 .accept(MediaType.APPLICATION_JSON);
 
                 MvcResult mvcResult = mockMvc.perform(request)
-                                .andExpect(MockMvcResultMatchers.status().isNoContent()) 
+                                .andExpect(MockMvcResultMatchers.status().isNoContent())
                                 .andDo(MockMvcResultHandlers.print())
                                 .andReturn();
 
                 String actualResponseBody = mvcResult.getResponse().getContentAsString();
-                log.info(actualResponseBody); 
+                log.info(actualResponseBody);
         }
 
         @Test
@@ -140,7 +140,7 @@ public class ProductTest {
                 when(productService.updateProduct(res.getId(), req)).thenReturn(res);
                 String payload = objectMapper.writeValueAsString(req);
                 log.info(payload);
-                MockHttpServletRequestBuilder request = MockMvcRequestBuilders.put("/update-product/" + res.getId())
+                MockHttpServletRequestBuilder request = MockMvcRequestBuilders.put("/update-product/{id}" + res.getId())
                                 .characterEncoding("utf-8")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
@@ -219,7 +219,7 @@ public class ProductTest {
          
 
         // when(something happens).thenReturn(do something)
-        when(productService.getList()).thenReturn(List.of(new Product(1L, null, null, "gelas", 1, 1)));
+        when(productService.getList()).thenReturn(List.of(new Product()));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/product-list")
                 .header("Authorization", token))

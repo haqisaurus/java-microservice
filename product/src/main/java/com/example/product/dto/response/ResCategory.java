@@ -1,7 +1,5 @@
 package com.example.product.dto.response;
 
-import java.sql.Timestamp;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -14,15 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true) 
-public class ResProduct {
-    Long id;
-    Timestamp updatedAt;
-    Timestamp createdAt;
-    Long productId;
-
+public class ResCategory {
     String name;
-    Integer qty;
-    Integer price;
-
-    ResCategory category;
 }

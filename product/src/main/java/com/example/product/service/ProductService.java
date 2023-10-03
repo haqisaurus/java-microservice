@@ -24,8 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class ProductService {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ProductService.class);
-
+    
     @Autowired
     private ProductRepo productRepo;
     @Autowired
@@ -60,8 +59,9 @@ public class ProductService {
         }
         Page<ResProduct> newPaged = paged.map(new Function<Product, ResProduct>() {
             @Override
-            public ResProduct apply(Product entity) {
-                ResProduct dto = modelMapper.map(entity, ResProduct.class);
+            public ResProduct apply(Product product) {
+                modelMapper.getConfiguration().setAmbiguityIgnored(true);
+                ResProduct dto = modelMapper.map(product, ResProduct.class);
 
                 return dto;
             }
