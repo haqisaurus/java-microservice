@@ -7,15 +7,19 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data 
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResUser {
-    Long id; 
-    String firstName;
-    String lastName;
-    String username; 
-    List<ResCompanyRole> userCompanyRole;
+    private Long id; 
+    private String firstName;
+    private String lastName;
+    private String username; 
+    private List<ResCompanyRole> userCompanyRole;
 }
