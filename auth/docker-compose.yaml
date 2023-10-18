@@ -1,0 +1,8 @@
+version: '3.1'
+services:
+  spring-auth:
+    container_name: cobaspring
+    image: cobaspring:latest
+    restart: always
+    ports:
+      - 8081:8081
