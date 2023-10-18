@@ -2,6 +2,8 @@ package com.example.auth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -25,6 +27,7 @@ import com.example.auth.dto.request.ReqLogin;
 import com.example.auth.dto.response.ResUser;
 import com.example.auth.entity.User;
 import com.example.auth.repository.UserRepo;
+import com.example.auth.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +45,8 @@ public class UserNewTest {
     @Autowired
     JwtTokenUtil tokenUtil;
     private String token;
+    @Autowired
+    UserService userService;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +75,17 @@ public class UserNewTest {
                     log.info(response);
                     Assertions.assertNotNull(response);
                     Assertions.assertEquals(resUser.getId(), dbUser.getId());
-                    Assertions.assertEquals(resUser.getLastName(), dbUser.getLastName()); 
+                    Assertions.assertEquals(resUser.getLastName(), dbUser.getLastName());
                 });
+    }
+
+    @Test
+    void testPrivateMethodTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Method privateMethod = UserService.class.getDeclaredMethod("privateMethod", String.class, Integer.class);
+        privateMethod.setAccessible(true);
+        // Invoke the private method on the instance
+        String result =  (String) privateMethod.invoke(userService, "john", 9);
+        log.info(result);
+        Assertions.assertEquals(result, "john9");
     }
 }

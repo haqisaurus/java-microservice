@@ -1,5 +1,14 @@
 
-spring: 
+logging:
+  level:
+    root: ERROR
+    org.springframework.web: ERROR
+    com.example.auth: TRACE  
+    org.hibernate.SQL: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
+
+spring:  
   cloud:
     discovery:
       enabled: false
@@ -24,10 +33,13 @@ spring:
  
   jpa:
     database: MYSQL
+    # show_sql: true
   # Hibernate ddl auto (create, create-drop, validate, update) 
-    hibernate:
+    hibernate: 
       ddlAuto: update
     properties: 
-      show_sql: true
-      format_sql: true
+      hibernate:
+        # generate_statistics: true
+        # type: trace
+        format_sql: true
       # DEBUG or TRACE is ok 

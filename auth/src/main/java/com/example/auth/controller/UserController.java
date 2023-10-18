@@ -22,7 +22,7 @@ public class UserController {
     @GetMapping(value = "/detail")
     public ResponseEntity<?> getCurrentUserDetail() {
         ResUser user = userService.getUserDetail();
-
+        System.out.println(org.hibernate.Version.getVersionString());
         return ResponseEntity.ok(user);
     }
 }

@@ -64,4 +64,8 @@ public class UserService {
         ResUser resUser = modelMapper.map(user, ResUser.class);
         return resUser;
     }
+
+    private String privateMethod(String nama, Integer umur) {
+        return nama.concat(String.valueOf(umur));
+    }
 }
