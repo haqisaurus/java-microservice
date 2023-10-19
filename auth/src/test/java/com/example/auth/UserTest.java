@@ -3,6 +3,7 @@ package com.example.auth;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +26,7 @@ import com.example.auth.config.jwt.JwtTokenUtil;
 import com.example.auth.config.jwt.JwtUserDetail;
 import com.example.auth.dto.response.ResUser;
 import com.example.auth.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,9 +38,7 @@ public class UserTest {
     private MockMvc mockMvc;
     @MockBean
     private UserService userService;
-    
-
-   
+ 
 
     @Test
     @DisplayName("Detail login test")
