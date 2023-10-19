@@ -97,8 +97,10 @@ public class UserService {
                 predicates.add(builder.like(root.get("username"), "%" + params.getUsername() + "%"));
             }
 
-            // disini digabungkan menggunakan and atau or 
-            Predicate andPredicate = (Predicate) builder.or(predicates.toArray(new Predicate[predicates.size()]));
+            predicates.add(builder.greaterThanOrEqualTo(root.get("createdAt"),  System.currentTimeMillis() - 10000000L));
+
+            // disini digabungkan menggunakan and atau or
+            Predicate andPredicate = (Predicate) builder.and(predicates.toArray(new Predicate[predicates.size()]));
             return query.where(andPredicate).getRestriction();
         };
 
