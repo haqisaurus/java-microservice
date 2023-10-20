@@ -13,23 +13,27 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.auth.config.jwt.JwtTokenUtil;
 import com.example.auth.config.jwt.JwtUserDetail;
 import com.example.auth.dto.SearchUser;
 import com.example.auth.dto.request.ReqLogin;
+import com.example.auth.dto.request.ReqUser;
 import com.example.auth.dto.response.ResLogin;
 import com.example.auth.dto.response.ResUser;
 import com.example.auth.entity.Role;
 import com.example.auth.entity.User;
 import com.example.auth.entity.UserCompanyRole;
 import com.example.auth.exception.ResourceNotFoundException;
+import com.example.auth.repository.RoleRepo;
 import com.example.auth.repository.UserRepo;
 
 import jakarta.persistence.criteria.Join;
@@ -46,6 +50,8 @@ public class UserService {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private RoleRepo roleRepo;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -83,6 +89,25 @@ public class UserService {
         return nama.concat(String.valueOf(umur));
     }
 
+    @Transactional
+    public void updateUser(ReqUser payload) {
+        User user = userRepo.findById(payload.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
+        user.setFirstName(payload.getFirstName());
+        user.setLastName(payload.getLastName());
+        userRepo.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public ResUser getByRole() {
+        // Role role = roleRepo.findById(1L).orElseThrow(null);
+        User user = userRepo.findTopByUserCompanyRole_RoleName("ADMIN")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
+
+        ResUser response = modelMapper.map(user, ResUser.class);
+        response.setCompanyName(user.getUserCompanyRole().get(0).getCompany().getName());
+        return response;
+    }
+
     @Transactional(readOnly = true)
     public Page<ResUser> searchUser(SearchUser params) {
 
@@ -118,7 +143,7 @@ public class UserService {
         Page<User> users = userRepo.findAll(specification, pageable);
         List<ResUser> contactResponses = users.getContent().stream()
                 .map(v -> {
-                    return ResUser.builder().firstName(v.getFirstName()).lastName(v.getLastName())
+                    return ResUser.builder().firstName(v.getFirstName()).lastName(v.getLastName()).companyName(v.getUserCompanyRole().get(0).getCompany().getName())
                             .username(v.getUsername()).build();
                 })
                 .toList();

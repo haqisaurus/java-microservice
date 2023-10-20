@@ -28,6 +28,11 @@ public class UserController {
         System.out.println(org.hibernate.Version.getVersionString());
         return ResponseEntity.ok(user);
     }
+    @GetMapping(value = "/check-user")
+    public ResponseEntity<?> getCheckUser() {
+        ResUser user = userService.getByRole();
+        return ResponseEntity.ok(user);
+    }
 
     @GetMapping(value = "/search")
     public ResponseEntity<?> getSEarchUser(

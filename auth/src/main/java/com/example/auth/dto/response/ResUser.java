@@ -21,5 +21,7 @@ public class ResUser {
     private String firstName;
     private String lastName;
     private String username; 
+    private String companyName;
+
     private List<ResCompanyRole> userCompanyRole;
 }

@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.auth.dto.request.ReqLogin;
+import com.example.auth.dto.request.ReqUser;
 import com.example.auth.dto.response.ResLogin;
 import com.example.auth.exception.ResourceNotFoundException;
 import com.example.auth.service.UserService;
 
-@RestController 
+@RestController
 public class AuthController {
     @Autowired
     UserService userService;
@@ -26,25 +27,32 @@ public class AuthController {
         ResLogin response = userService.performLogin(req);
         return ResponseEntity.ok(response);
     }
+
     @GetMapping(value = "/login")
     public ResponseEntity<?> getLogin() {
-         
+
         return ResponseEntity.ok("response");
     }
 
     @GetMapping(value = "/pass")
     public ResponseEntity<?> getPass() {
-         
+
         return ResponseEntity.ok(passwordEncoder.encode("password"));
+    }
+
+    @PostMapping(value = "/update")
+    public ResponseEntity<?> postUpdateUser(@RequestBody ReqUser req) {
+        userService.updateUser(req);
+        return ResponseEntity.ok("OK");
     }
 
     @GetMapping(value = "/secure")
     public ResponseEntity<?> secure() {
-          
+
         // try {
-        //     accountService.publishOrderEvent(orderRequest);
-        // } catch (JsonProcessingException e) { 
-        //     e.printStackTrace();
+        // accountService.publishOrderEvent(orderRequest);
+        // } catch (JsonProcessingException e) {
+        // e.printStackTrace();
         // }
         // int a = 1/0;
         throw new ResourceNotFoundException("Resource with id  ot found");
