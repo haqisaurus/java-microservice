@@ -33,5 +33,5 @@ public class User {
     String password;
 
     @OneToMany(mappedBy = "user",targetEntity = UserCompanyRole.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<UserCompanyRole> UserCompanyRole;
+    private List<UserCompanyRole> userCompanyRole;
 }

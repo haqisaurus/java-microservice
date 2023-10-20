@@ -26,11 +26,14 @@ import com.example.auth.dto.SearchUser;
 import com.example.auth.dto.request.ReqLogin;
 import com.example.auth.dto.response.ResLogin;
 import com.example.auth.dto.response.ResUser;
+import com.example.auth.entity.Role;
 import com.example.auth.entity.User;
 import com.example.auth.entity.UserCompanyRole;
 import com.example.auth.exception.ResourceNotFoundException;
 import com.example.auth.repository.UserRepo;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -97,7 +100,14 @@ public class UserService {
                 predicates.add(builder.like(root.get("username"), "%" + params.getUsername() + "%"));
             }
 
-            predicates.add(builder.greaterThanOrEqualTo(root.get("createdAt"),  System.currentTimeMillis() - 10000000L));
+            // predicates.add(builder.greaterThanOrEqualTo(root.get("createdAt"),
+            // System.currentTimeMillis() - 10000000L));
+
+            // jika join
+            Join<User, UserCompanyRole> joinRelation = root.join("userCompanyRole", JoinType.INNER);
+            Join<UserCompanyRole, Role> joinRole = joinRelation.join("role", JoinType.INNER);
+
+            predicates.add(builder.equal(joinRole.get("name"), "ADMIN"));
 
             // disini digabungkan menggunakan and atau or
             Predicate andPredicate = (Predicate) builder.and(predicates.toArray(new Predicate[predicates.size()]));
