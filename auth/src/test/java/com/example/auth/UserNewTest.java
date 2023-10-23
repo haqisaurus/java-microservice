@@ -1,28 +1,24 @@
 package com.example.auth;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.hamcrest.MatcherAssert;
+import com.example.auth.config.jwt.JwtTokenUtil;
+import com.example.auth.config.jwt.JwtUserDetail;
+import com.example.auth.dto.request.ReqUser;
+import com.example.auth.dto.response.ResUser;
+import com.example.auth.entity.User;
+import com.example.auth.repository.UserRepo;
+import com.example.auth.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.Predicate;
+import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,18 +27,12 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.example.auth.config.jwt.JwtTokenUtil;
-import com.example.auth.config.jwt.JwtUserDetail;
-import com.example.auth.dto.request.ReqLogin;
-import com.example.auth.dto.request.ReqUser;
-import com.example.auth.dto.response.ResUser;
-import com.example.auth.entity.User;
-import com.example.auth.repository.UserRepo;
-import com.example.auth.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.persistence.criteria.Predicate;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -78,11 +68,11 @@ public class UserNewTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token)
-                .queryParam("name", "la");
+                .queryParam("name", "mi");
 
         mockMvc.perform(request)
                 .andExpectAll(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[*].lastName", Matchers.contains("la")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[*].lastName", Matchers.contains("mia")));
 
     }
 
@@ -100,7 +90,7 @@ public class UserNewTest {
             predicates.add(builder.equal(root.get("lastName"), "mia"));
 
             // disini digabungkan menggunakan and atau or
-            Predicate andPredicate = (Predicate) builder.and(predicates.toArray(new Predicate[predicates.size()]));
+            Predicate andPredicate = builder.and(predicates.toArray(new Predicate[0]));
             return query.where(andPredicate).getRestriction();
         };
         User dbUserAfter = userRepo.findOne(specification).orElseThrow();
@@ -117,7 +107,7 @@ public class UserNewTest {
     @Test
     void testRegisterSuccess() throws Exception {
         User dbUser = userRepo.findById(1L).orElseThrow();
-        ReqLogin payload = ReqLogin.builder().username("test").password("test").build();
+//        ReqLogin payload = ReqLogin.builder().username("test").password("test").build();
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/user/detail")
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
