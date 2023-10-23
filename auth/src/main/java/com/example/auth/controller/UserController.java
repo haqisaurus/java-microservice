@@ -1,20 +1,14 @@
 package com.example.auth.controller;
 
+import com.example.auth.dto.SearchUser;
+import com.example.auth.dto.request.ReqBirthDate;
+import com.example.auth.dto.response.ResUser;
+import com.example.auth.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.auth.config.jwt.JwtUserDetail;
-import com.example.auth.dto.SearchUser;
-import com.example.auth.dto.response.ResUser;
-import com.example.auth.entity.User;
-import com.example.auth.service.UserService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -42,7 +36,13 @@ public class UserController {
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
             ) {
         SearchUser searchParams = SearchUser.builder().name(name).username(username).page(page).size(size).build();
-        Page<ResUser> contactResponses = (Page<ResUser>) userService.searchUser(searchParams);
+        Page<ResUser> contactResponses = userService.searchUser(searchParams);
         return ResponseEntity.ok(contactResponses);
+    }
+
+    @PostMapping(value = "/custom-validation" )
+    public ResponseEntity<?> postTestCustomValidation(@Valid @RequestBody ReqBirthDate request) {
+
+        return ResponseEntity.ok(request);
     }
 }
