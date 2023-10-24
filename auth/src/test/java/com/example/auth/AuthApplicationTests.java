@@ -1,13 +1,14 @@
 package com.example.auth;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.example.auth.dto.request.ReqUser;
+import com.example.auth.entity.User;
+import com.example.auth.repository.UserRepo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -47,8 +48,11 @@ class AuthApplicationTests {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@MockBean
+	@Autowired
 	private UserService userService;
+
+	@MockBean
+	private UserRepo userRepo;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -66,6 +70,24 @@ class AuthApplicationTests {
 			log.info(token.get("token").toString());
 
 		});
+	}
+
+	@Test
+	@DisplayName("testing verify void function")
+	public void userUpdateTest() {
+		ReqUser reqData = ReqUser.builder().id(1L).firstName("la").lastName("mia").username("lamia").build();
+		User updateData = new User();
+		updateData.setId(1L);
+		updateData.setFirstName("la");
+		updateData.setLastName("mia");
+		updateData.setUsername("lamia");
+		Optional<User> userOption = Optional.of(updateData);
+//		ketika method yang di panggil apa akan mengembalikan apa
+		Mockito.when(userRepo.findById(reqData.getId())).thenReturn(userOption);
+		userService.updateUser(reqData);
+//		memastikan kalau method di repository terpanggil 1 x untun save dan find by id
+		Mockito.verify(userRepo, Mockito.times(1)).save(updateData);
+		Mockito.verify(userRepo, Mockito.times(1)).findById(reqData.getId());
 	}
 
 	@Test
