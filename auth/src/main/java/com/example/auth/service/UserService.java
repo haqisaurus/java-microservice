@@ -115,7 +115,7 @@ public class UserService {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.add(builder.equal(root.get("user"), user));
             if (Objects.nonNull(params.getName())) {
-                predicates.add((Predicate) builder.or(
+                predicates.add(builder.or(
                         builder.like(root.get("firstName"), "%" + params.getName() + "%"),
                         builder.like(root.get("lastName"), "%" + params.getName() + "%")));
 
@@ -135,7 +135,7 @@ public class UserService {
             predicates.add(builder.equal(joinRole.get("name"), "ADMIN"));
 
             // disini digabungkan menggunakan and atau or
-            Predicate andPredicate = (Predicate) builder.and(predicates.toArray(new Predicate[predicates.size()]));
+            Predicate andPredicate = builder.and(predicates.toArray(new Predicate[predicates.size()]));
             return query.where(andPredicate).getRestriction();
         };
 
@@ -149,5 +149,9 @@ public class UserService {
                 .toList();
 
         return new PageImpl<>(contactResponses, pageable, users.getTotalElements());
+    }
+
+    public List<User> getUsers() {
+        return userRepo.findAll();
     }
 }
