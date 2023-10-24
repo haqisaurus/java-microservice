@@ -1,25 +1,25 @@
 package com.example.auth.config.jwt.filterrequest;
 
-import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.example.auth.config.jwt.JwtTokenUtil;
 import com.example.auth.config.jwt.JwtUserDetail;
 import com.example.auth.config.jwt.JwtUserDetailService;
-
+import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
 
 @Component
+@Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -28,12 +28,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtUserDetailService jwtUserDetailService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, @Nullable HttpServletResponse response,@Nullable FilterChain filterChain)
             throws ServletException, IOException {
         String incomingRequest = " REQUEST ##### " + request.getRemoteAddr() + " <==> " + request.getMethod()
                 + " path ===> " + request.getRequestURI() + " :: size " + (request.getContentLength()) + " b :: type "
                 + request.getContentType();
-        logger.info(incomingRequest);
+        log.info(incomingRequest);
 
         String authHeader = request.getHeader("Authorization");
         String token = null;
@@ -53,6 +53,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 // logger.info(userDetails.getId());
             }
         }
+        assert filterChain != null;
         filterChain.doFilter(request, response);
     }
 

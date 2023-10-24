@@ -29,12 +29,12 @@ import java.util.Collections;
 @Slf4j
 public class CustomValidationTest {
     @Autowired
-    private MockMvc mockMvc;
-    @Autowired
     JwtTokenUtil tokenUtil;
-    private String token;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private MockMvc mockMvc;
+    private String token;
 
     @BeforeEach
     void setUp() {
@@ -44,6 +44,7 @@ public class CustomValidationTest {
         log.info(claims.get("token").toString());
         token = "Bearer " + claims.get("token").toString();
     }
+
     @Test
     @DisplayName("Test upload file success")
     public void testUploadFileSuccess() throws Exception {
@@ -51,7 +52,7 @@ public class CustomValidationTest {
         log.info(fileResource.getFilename());
 //        java.io.File file = new java.io.File("D:\\experimental\\microservice java\\auth\\src\\main\\resources\\banner.txt");
 //        FileInputStream fileInputStream = new FileInputStream(file);
-        MockMultipartFile firstFile = new MockMultipartFile("file", fileResource.getFilename(),  MediaType.TEXT_PLAIN_VALUE, fileResource.getInputStream());
+        MockMultipartFile firstFile = new MockMultipartFile("file", fileResource.getFilename(), MediaType.TEXT_PLAIN_VALUE, fileResource.getInputStream());
 //        MockMultipartFile file
 //                = new MockMultipartFile(
 //                "file",
@@ -59,24 +60,26 @@ public class CustomValidationTest {
 //                MediaType.TEXT_PLAIN_VALUE,
 //                "Hello, World!".getBytes()
 //        );
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.multipart("/user/upload-file")
-//                .file("file", firstFile.getBytes())
-                .file(firstFile)
-                .header("Authorization", token) ;
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.multipart("/user/upload-file").file(firstFile).header("Authorization", token);
 
-        mockMvc.perform(request)
-                .andExpectAll(MockMvcResultMatchers.status().isOk()) ;
+        mockMvc.perform(request).andExpectAll(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
     @DisplayName("Test download file success")
     public void testDownloadFileSuccess() throws Exception {
 
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/user/download-file")
-                .header("Authorization", token) ;
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/user/download-file").header("Authorization", token);
 
-        mockMvc.perform(request)
-                .andExpectAll(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType("application/xml"));
+        mockMvc.perform(request).andExpectAll(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().contentType("application/xml"));
+    }
+
+    @Test
+    @DisplayName("Test download report success")
+    public void testDownloadReportSuccess() throws Exception {
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/user/download-report").header("Authorization", token);
+
+        mockMvc.perform(request).andExpectAll(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().contentType("application/octet-stream")).andExpect(MockMvcResultMatchers.header().string("Content-Disposition", "attachment; filename=\"item-report.pdf\""));
     }
 }
