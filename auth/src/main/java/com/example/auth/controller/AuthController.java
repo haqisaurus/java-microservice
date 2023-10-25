@@ -32,13 +32,11 @@ public class AuthController {
 
     @GetMapping(value = "/login")
     public ResponseEntity<?> getLogin() {
-
         return ResponseEntity.ok("response");
     }
 
     @GetMapping(value = "/pass")
     public ResponseEntity<?> getPass() {
-
         return ResponseEntity.ok(passwordEncoder.encode("password"));
     }
 
@@ -50,7 +48,6 @@ public class AuthController {
 
     @GetMapping(value = "/secure")
     public ResponseEntity<?> secure() {
-
         throw new ResourceNotFoundException("Resource with id  not found");
     }
 }
