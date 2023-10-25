@@ -9,12 +9,11 @@ public class ApiError {
     private Date timestamp;
     private String message;
     private String details;
+    private Integer code;
 
-    public ApiError(Date timestamp, String message, String details) {
+    public ApiError( ) {
 		super();
-		this.timestamp = timestamp;
-		this.message = message;
-		this.details = details;
+
 	}
 
 }

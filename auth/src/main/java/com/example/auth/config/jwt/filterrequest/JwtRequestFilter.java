@@ -22,17 +22,17 @@ import java.io.IOException;
 @Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
 
+    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtUserDetailService jwtUserDetailService;
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-    @Autowired
-    private JwtUserDetailService jwtUserDetailService;
+    JwtRequestFilter(JwtTokenUtil jwtTokenUtil, JwtUserDetailService jwtUserDetailService) {
+        this.jwtTokenUtil=jwtTokenUtil;
+        this.jwtUserDetailService=jwtUserDetailService;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, @Nullable HttpServletResponse response,@Nullable FilterChain filterChain)
-            throws ServletException, IOException {
-        String incomingRequest = " REQUEST ##### " + request.getRemoteAddr() + " <==> " + request.getMethod()
-                + " path ===> " + request.getRequestURI() + " :: size " + (request.getContentLength()) + " b :: type "
-                + request.getContentType();
+    protected void doFilterInternal(HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable FilterChain filterChain) throws ServletException, IOException {
+        String incomingRequest = " REQUEST ##### " + request.getRemoteAddr() + " <==> " + request.getMethod() + " path ===> " + request.getRequestURI() + " :: size " + (request.getContentLength()) + " b :: type " + request.getContentType();
         log.info(incomingRequest);
 
         String authHeader = request.getHeader("Authorization");
@@ -56,5 +56,4 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         assert filterChain != null;
         filterChain.doFilter(request, response);
     }
-
 }

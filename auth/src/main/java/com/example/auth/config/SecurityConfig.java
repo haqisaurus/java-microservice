@@ -1,7 +1,9 @@
 package com.example.auth.config;
 
+import com.example.auth.config.jwt.JwtEntryPoint;
+import com.example.auth.config.jwt.JwtUserDetailService;
+import com.example.auth.config.jwt.filterrequest.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,20 +23,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.example.auth.config.jwt.JwtEntryPoint;
-import com.example.auth.config.jwt.JwtUserDetailService;
-import com.example.auth.config.jwt.filterrequest.JwtRequestFilter;
-import com.example.auth.service.UserService;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @Slf4j
 public class SecurityConfig {
+    private final JwtRequestFilter jwtRequestFilter;
+    private final JwtEntryPoint jwtEntryPoint;
     @Autowired
-    private JwtRequestFilter jwtRequestFilter;
-    @Autowired
-    private JwtEntryPoint jwtEntryPoint;
+    SecurityConfig(JwtRequestFilter jwtRequestFilter, JwtEntryPoint jwtEntryPoint) {
+        this.jwtRequestFilter=jwtRequestFilter;
+        this.jwtEntryPoint=jwtEntryPoint;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         c -> c.requestMatchers(HttpMethod.POST, "/login")
                                 .permitAll() 
-                                .requestMatchers(HttpMethod.GET, "/pass")
+                                .requestMatchers(HttpMethod.GET, "/pass", "/error")
                                 .permitAll() 
                                 .anyRequest()
                                 .authenticated())

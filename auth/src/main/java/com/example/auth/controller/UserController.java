@@ -5,6 +5,7 @@ import com.example.auth.dto.request.ReqBirthDate;
 import com.example.auth.dto.response.ResCommon;
 import com.example.auth.dto.response.ResUser;
 import com.example.auth.entity.User;
+import com.example.auth.exception.ResourceNotFoundException;
 import com.example.auth.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,10 @@ import net.sf.jasperreports.engine.util.JRSaver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
-import org.springframework.http.*;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,7 +67,6 @@ public class UserController {
 
     @PostMapping(value = "/custom-validation")
     public ResponseEntity<?> postTestCustomValidation(@Valid @RequestBody ReqBirthDate request) {
-
         return ResponseEntity.ok(request);
     }
 
@@ -124,5 +127,11 @@ public class UserController {
         }
         ByteArrayResource resource = new ByteArrayResource(reportContent);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).contentLength(resource.contentLength()).header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename("item-report.pdf").build().toString()).body(resource);
+    }
+
+    @GetMapping(value = "/custom-error")
+    public ResponseEntity<?> getCustomError()   {
+        throw new ResourceNotFoundException("Error terjadi karena sengaja");
+//        return ResponseEntity.ok("OK");
     }
 }
