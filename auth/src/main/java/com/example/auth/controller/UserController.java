@@ -2,6 +2,7 @@ package com.example.auth.controller;
 
 import com.example.auth.dto.SearchUser;
 import com.example.auth.dto.request.ReqBirthDate;
+import com.example.auth.dto.response.ResCommon;
 import com.example.auth.dto.response.ResUser;
 import com.example.auth.entity.User;
 import com.example.auth.service.UserService;
@@ -25,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +35,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    @Autowired
     UserService userService;
+    @Autowired
+    UserController(UserService userService) {
+        this.userService=userService;
+    }
 
     @GetMapping(value = "/detail")
     public ResponseEntity<?> getCurrentUserDetail() {
@@ -63,7 +68,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/upload-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> postUploadFile(@RequestParam(name = "file", required = true) MultipartFile file) throws IOException {
+    public ResponseEntity<?> postUploadFile(@RequestParam(name = "file") MultipartFile file) throws IOException {
 //        String extension = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf(".") + 1);
         Path filepath = Paths.get("/" + file.getOriginalFilename());
         // save file
@@ -74,11 +79,16 @@ public class UserController {
         fop.close();
         log.info(file.getOriginalFilename());
         log.info(filepath.toString());
-        return file.isEmpty() ? new ResponseEntity<String>(HttpStatus.NOT_FOUND) : new ResponseEntity<String>(HttpStatus.OK);
+        List<String> list = new ArrayList<>();
+        list.add("test");
+        ResCommon response = ResCommon.builder().code(0).message("file uploaded").data(list).build();
+        return ResponseEntity.ok(response);
+
+//        return file.isEmpty() ? new ResponseEntity<String>(HttpStatus.NOT_FOUND) : new ResponseEntity<String>(HttpStatus.OK).bo;
     }
 
     @GetMapping(value = "/download-report")
-    public ResponseEntity<?> getDownloadReport() throws IOException, JRException {
+    public ResponseEntity<?> getDownloadReport() {
 
         JasperReport jasperReport;
 
@@ -102,7 +112,7 @@ public class UserController {
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(items);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("title", "Item Report");
-        JasperPrint jasperPrint = null;
+        JasperPrint jasperPrint;
         byte[] reportContent;
 
         try {
