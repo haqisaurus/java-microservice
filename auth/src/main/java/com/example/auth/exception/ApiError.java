@@ -1,13 +1,10 @@
 package com.example.auth.exception;
 
-import java.time.LocalDateTime;
+import lombok.Data;
+
 import java.util.Date;
-import java.util.List;
 
-import org.springframework.http.HttpStatus;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+@Data
 public class ApiError {
     private Date timestamp;
     private String message;
@@ -20,27 +17,4 @@ public class ApiError {
 		this.details = details;
 	}
 
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
-    }
 }

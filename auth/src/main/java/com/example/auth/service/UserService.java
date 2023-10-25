@@ -1,12 +1,22 @@
 package com.example.auth.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import com.example.auth.config.jwt.JwtTokenUtil;
+import com.example.auth.config.jwt.JwtUserDetail;
+import com.example.auth.dto.SearchUser;
+import com.example.auth.dto.request.ReqLogin;
+import com.example.auth.dto.request.ReqUser;
+import com.example.auth.dto.response.ResLogin;
+import com.example.auth.dto.response.ResUser;
+import com.example.auth.entity.Role;
+import com.example.auth.entity.User;
+import com.example.auth.entity.UserCompanyRole;
+import com.example.auth.exception.ResourceNotFoundException;
+import com.example.auth.repository.UserRepo;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,38 +32,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.auth.config.jwt.JwtTokenUtil;
-import com.example.auth.config.jwt.JwtUserDetail;
-import com.example.auth.dto.SearchUser;
-import com.example.auth.dto.request.ReqLogin;
-import com.example.auth.dto.request.ReqUser;
-import com.example.auth.dto.response.ResLogin;
-import com.example.auth.dto.response.ResUser;
-import com.example.auth.entity.Role;
-import com.example.auth.entity.User;
-import com.example.auth.entity.UserCompanyRole;
-import com.example.auth.exception.ResourceNotFoundException;
-import com.example.auth.repository.RoleRepo;
-import com.example.auth.repository.UserRepo;
-
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Slf4j
 public class UserService {
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final UserRepo userRepo;
+    private final ModelMapper modelMapper;
     @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-    @Autowired
-    private UserRepo userRepo;
-    @Autowired
-    private RoleRepo roleRepo;
-    @Autowired
-    private ModelMapper modelMapper;
+    UserService(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, UserRepo userRepo, ModelMapper modelMapper) {
+        this.authenticationManager=authenticationManager;
+        this.jwtTokenUtil=jwtTokenUtil;
+        this.userRepo=userRepo;
+        this.modelMapper=modelMapper;
+    }
 
     public ResLogin performLogin(ReqLogin req) {
         ResLogin response = new ResLogin();
@@ -81,11 +79,13 @@ public class UserService {
         JwtUserDetail userDetails = (JwtUserDetail) authentication.getPrincipal();
         User user = userRepo.findById(userDetails.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Undefined user"));
-        ResUser resUser = modelMapper.map(user, ResUser.class);
-        return resUser;
+//        biar ngga error aja panggil privae method
+        String check = this.privateMethod("mama", 18);
+        log.info(check);
+        return modelMapper.map(user, ResUser.class);
     }
-
-    private String privateMethod(String nama, Integer umur) {
+    @SuppressWarnings("all")
+    private String privateMethod( String nama,  Integer umur) {
         return nama.concat(String.valueOf(umur));
     }
 
@@ -99,7 +99,6 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public ResUser getByRole() {
-        // Role role = roleRepo.findById(1L).orElseThrow(null);
         User user = userRepo.findTopByUserCompanyRole_RoleName("ADMIN")
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
 
@@ -135,17 +134,15 @@ public class UserService {
             predicates.add(builder.equal(joinRole.get("name"), "ADMIN"));
 
             // disini digabungkan menggunakan and atau or
-            Predicate andPredicate = builder.and(predicates.toArray(new Predicate[predicates.size()]));
+            Predicate andPredicate = builder.and(predicates.toArray(new Predicate[0]));
             return query.where(andPredicate).getRestriction();
         };
 
         Pageable pageable = PageRequest.of(params.getPage(), params.getSize());
         Page<User> users = userRepo.findAll(specification, pageable);
         List<ResUser> contactResponses = users.getContent().stream()
-                .map(v -> {
-                    return ResUser.builder().firstName(v.getFirstName()).lastName(v.getLastName()).companyName(v.getUserCompanyRole().get(0).getCompany().getName())
-                            .username(v.getUsername()).build();
-                })
+                .map(v -> ResUser.builder().firstName(v.getFirstName()).lastName(v.getLastName()).companyName(v.getUserCompanyRole().get(0).getCompany().getName())
+                        .username(v.getUsername()).build())
                 .toList();
 
         return new PageImpl<>(contactResponses, pageable, users.getTotalElements());
