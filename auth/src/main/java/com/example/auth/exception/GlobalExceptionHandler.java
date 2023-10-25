@@ -52,8 +52,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // handling global exception
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> globalExceptionHandling(Exception exception, WebRequest request) {
+    @ExceptionHandler(InternalServerException.class)
+    public ResponseEntity<?> globalExceptionHandling(InternalServerException exception, WebRequest request) {
         log.error("ada error 500", exception);
 
         ApiError errorDetails = new ApiError(new Date(), exception.getMessage(),
@@ -61,11 +61,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
     @ExceptionHandler({ AuthenticationException.class })
     public ResponseEntity<?> handleAuthenticationException(Exception ex, WebRequest request) {
         ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
 
     }
+    @ExceptionHandler({ AccessDeniedException.class })
+    public ResponseEntity<?> handleAccessException(AccessDeniedException ex, WebRequest request) {
+        ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
 
+    }
 }
