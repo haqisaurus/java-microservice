@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class SearchUser {
     private String name;
     private String username; 
-    private Integer page;
- 
-    private Integer size;
+    private int page;
+    private int size;
 }

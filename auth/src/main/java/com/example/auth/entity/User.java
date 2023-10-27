@@ -1,21 +1,12 @@
 package com.example.auth.entity;
 
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Set;
-
+import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Version;
-import lombok.Data;
+import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Data
@@ -23,7 +14,7 @@ import lombok.Data;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    long id;
     @UpdateTimestamp
     Timestamp updatedAt;
     @CreationTimestamp
@@ -33,7 +24,7 @@ public class User {
     String username;
     String password;
     @Version
-    private Integer version;
+    private int version;
 
     @OneToMany(mappedBy = "user",targetEntity = UserCompanyRole.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<UserCompanyRole> userCompanyRole;

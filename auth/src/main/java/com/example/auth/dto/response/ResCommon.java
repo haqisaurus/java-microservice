@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResCommon {
-    Integer code;
+    int code;
     Object data;
     String message;
 }

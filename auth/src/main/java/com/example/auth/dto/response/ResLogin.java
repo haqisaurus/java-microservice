@@ -6,5 +6,5 @@ import lombok.Data;
 public class ResLogin {
     String token;
     String refreshToken;
-    Long expired;
+    long expired;
 }

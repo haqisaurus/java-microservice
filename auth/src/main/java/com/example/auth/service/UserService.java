@@ -85,7 +85,7 @@ public class UserService {
         return modelMapper.map(user, ResUser.class);
     }
     @SuppressWarnings("all")
-    private String privateMethod( String nama,  Integer umur) {
+    private String privateMethod( String nama,  int umur) {
         return nama.concat(String.valueOf(umur));
     }
 

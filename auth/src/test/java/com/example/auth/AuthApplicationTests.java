@@ -1,10 +1,14 @@
 package com.example.auth;
 
-import java.util.*;
-
+import com.example.auth.config.jwt.JwtTokenUtil;
+import com.example.auth.config.jwt.JwtUserDetail;
+import com.example.auth.dto.request.ReqLogin;
 import com.example.auth.dto.request.ReqUser;
+import com.example.auth.dto.response.ResLogin;
 import com.example.auth.entity.User;
 import com.example.auth.repository.UserRepo;
+import com.example.auth.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,15 +27,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.util.Assert;
 
-import com.example.auth.config.jwt.JwtEntryPoint;
-import com.example.auth.config.jwt.JwtTokenUtil;
-import com.example.auth.config.jwt.JwtUserDetail;
-import com.example.auth.dto.request.ReqLogin;
-import com.example.auth.dto.response.ResLogin;
-import com.example.auth.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
@@ -59,6 +59,7 @@ class AuthApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 	@Test
